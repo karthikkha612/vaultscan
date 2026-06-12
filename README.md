@@ -138,6 +138,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | POST   | `/api/scan/url`    | Scan a website URL       |
 | POST   | `/api/scan/github` | Scan a GitHub repository |
 
-## License
 
-MIT

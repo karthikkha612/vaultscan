@@ -11,8 +11,7 @@ export default function MatrixRain() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const chars =
-      "01ABCDEFアイウエオカキクケコサシスセソタチツテト$#@&%{}[]<>/\\";
+    const chars = "0123456789";
     const fontSize = 14;
     let columns = 0;
     let drops: number[] = [];
@@ -38,7 +37,7 @@ export default function MatrixRain() {
       if (time - lastTime < interval) return;
       lastTime = time;
 
-      ctx.fillStyle = "rgba(10, 14, 12, 0.08)";
+      ctx.fillStyle = "rgba(10, 14, 12, 0.06)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.font = `${fontSize}px monospace`;
@@ -51,8 +50,8 @@ export default function MatrixRain() {
         // brighter "head" character occasionally
         ctx.fillStyle =
           Math.random() > 0.96
-            ? "rgba(180, 255, 200, 0.5)"
-            : "rgba(34, 197, 94, 0.18)";
+            ? "rgba(220, 255, 220, 0.9)"
+            : "rgba(34, 197, 94, 0.45)";
         ctx.fillText(char, x, y);
 
         if (y > canvas.height && Math.random() > 0.975) {
@@ -80,7 +79,7 @@ export default function MatrixRain() {
         width: "100%",
         height: "100%",
         pointerEvents: "none",
-        opacity: 0.5,
+        opacity: 0.7,
         zIndex: 0,
       }}
     />

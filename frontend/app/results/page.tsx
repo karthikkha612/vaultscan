@@ -8,12 +8,12 @@ import FindingCard from "@/components/FindingCard";
 import type { ScanResponse } from "@/lib/api";
 import { getLatestScan } from "@/lib/api";
 
-const BADGE_COLORS: Record<string, string> = {
-  SAFE: "bg-accent/20 text-accent border-accent/30",
-  LOW: "bg-lime-500/20 text-lime-400 border-lime-500/30",
-  MEDIUM: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  HIGH: "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  CRITICAL: "bg-red-500/20 text-red-400 border-red-500/30",
+const RISK_COLORS: Record<string, string> = {
+  SAFE: "#22c55e",
+  LOW: "#84cc16",
+  MEDIUM: "#eab308",
+  HIGH: "#f97316",
+  CRITICAL: "#ef4444",
 };
 
 export default function ResultsPage() {
@@ -34,7 +34,10 @@ export default function ResultsPage() {
   if (!mounted || !scan) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
+          style={{ borderColor: "#22c55e", borderTopColor: "transparent" }}
+        />
       </div>
     );
   }
@@ -47,24 +50,46 @@ export default function ResultsPage() {
     }
   };
 
+  const accent = RISK_COLORS[scan.risk_level] || RISK_COLORS.MEDIUM;
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-      <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
+      {/* Header / scan info card */}
+      <div
+        className="mb-8 grid gap-6 rounded-lg p-6 lg:grid-cols-[1fr_auto] lg:items-center"
+        style={{
+          border: "1px solid rgba(34,197,94,0.15)",
+          backgroundColor: "rgba(255,255,255,0.015)",
+          backdropFilter: "blur(6px)",
+        }}
+      >
         <div>
-          <p className="mb-1 text-sm uppercase tracking-wide text-text/50">
-            Scan Results
+          <p
+            className="mb-1 text-xs font-bold uppercase tracking-widest"
+            style={{ color: "rgba(34,197,94,0.6)" }}
+          >
+            <span style={{ color: "#22c55e" }}>$</span> scan_results
           </p>
-          <h1 className="mb-2 break-all text-2xl font-bold text-text sm:text-3xl">
+          <h1
+            className="mb-2 break-all text-xl font-bold sm:text-2xl"
+            style={{ color: "#d4f4e1" }}
+          >
             {scan.target}
           </h1>
-          <div className="flex flex-wrap items-center gap-3 text-sm text-text/60">
+          <div
+            className="flex flex-wrap items-center gap-3 text-xs"
+            style={{ color: "rgba(212,244,225,0.45)" }}
+          >
             <span>{formatDate(scan.scanned_at)}</span>
-            <span>·</span>
-            <span className="capitalize">{scan.scan_type} scan</span>
+            <span style={{ color: "rgba(212,244,225,0.2)" }}>·</span>
+            <span className="uppercase tracking-wide">{scan.scan_type}_scan</span>
             <span
-              className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase ${
-                BADGE_COLORS[scan.risk_level] || BADGE_COLORS.MEDIUM
-              }`}
+              className="rounded px-2.5 py-1 text-xs font-bold uppercase tracking-wide"
+              style={{
+                color: accent,
+                backgroundColor: `${accent}1a`,
+                border: `1px solid ${accent}33`,
+              }}
             >
               {scan.risk_level}
             </span>
@@ -73,16 +98,29 @@ export default function ResultsPage() {
         <RiskGauge score={scan.overall_score} riskLevel={scan.risk_level} />
       </div>
 
+      {/* Findings */}
       <section className="mb-8">
-        <h2 className="mb-4 text-xl font-semibold text-text">
-          Findings ({scan.findings.length})
+        <h2
+          className="mb-4 text-sm font-bold uppercase tracking-widest"
+          style={{ color: "#22c55e" }}
+        >
+          <span style={{ color: "rgba(34,197,94,0.6)" }}>&gt;</span> findings ({scan.findings.length})
         </h2>
         {scan.findings.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-panel p-8 text-center">
-            <p className="text-lg font-medium text-accent">
-              No vulnerabilities detected
+          <div
+            className="rounded-lg p-8 text-center"
+            style={{
+              border: "1px solid rgba(34,197,94,0.15)",
+              backgroundColor: "rgba(34,197,94,0.04)",
+            }}
+          >
+            <p className="text-lg font-bold" style={{ color: "#22c55e" }}>
+              [ NO VULNERABILITIES DETECTED ]
             </p>
-            <p className="mt-2 text-sm text-text/60">
+            <p
+              className="mt-2 text-sm"
+              style={{ color: "rgba(212,244,225,0.5)" }}
+            >
               The scan completed without finding any security issues.
             </p>
           </div>
@@ -99,18 +137,29 @@ export default function ResultsPage() {
         )}
       </section>
 
+      {/* Actions */}
       <div className="flex flex-wrap gap-4">
         <Link
           href="/"
-          className="rounded-xl bg-accent px-6 py-3 font-semibold text-charcoal transition-all hover:bg-accent/90"
+          className="rounded-lg px-6 py-3 text-sm font-bold uppercase tracking-widest transition-all"
+          style={{
+            backgroundColor: "#22c55e",
+            color: "#0a0e0c",
+            boxShadow: "0 10px 30px -10px rgba(34,197,94,0.5)",
+          }}
         >
-          Scan Another
+          [ scan_another ]
         </Link>
         <Link
           href="/history"
-          className="rounded-xl border border-border bg-panel px-6 py-3 font-semibold text-text transition-all hover:border-accent/50 hover:text-accent"
+          className="rounded-lg px-6 py-3 text-sm font-bold uppercase tracking-widest transition-all"
+          style={{
+            border: "1px solid rgba(34,197,94,0.25)",
+            backgroundColor: "rgba(34,197,94,0.04)",
+            color: "#d4f4e1",
+          }}
         >
-          View History
+          [ view_history ]
         </Link>
       </div>
     </div>

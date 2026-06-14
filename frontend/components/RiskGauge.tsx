@@ -43,34 +43,59 @@ export default function RiskGauge({ score, riskLevel }: RiskGaugeProps) {
   }, [score]);
 
   return (
-    <div className="relative flex flex-col items-center">
-      <svg width="220" height="220" viewBox="0 0 220 220" className="-rotate-90">
-        <circle
-          cx="110"
-          cy="110"
-          r={radius}
-          fill="none"
-          stroke="#2a2a2a"
-          strokeWidth="12"
-        />
-        <circle
-          cx="110"
-          cy="110"
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth="12"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          className="transition-all duration-300"
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-5xl font-bold" style={{ color }}>
-          {animatedScore}
-        </span>
-        <span className="text-sm text-text/60">out of 100</span>
+    <div
+      className="relative flex flex-col items-center rounded-lg p-6"
+      style={{
+        border: "1px solid rgba(34,197,94,0.15)",
+        backgroundColor: "rgba(255,255,255,0.02)",
+        backdropFilter: "blur(6px)",
+        boxShadow: `0 20px 50px -15px ${color}33`,
+      }}
+    >
+      <span
+        className="mb-3 text-xs font-bold uppercase tracking-widest"
+        style={{ color: "rgba(212,244,225,0.4)" }}
+      >
+        risk_score
+      </span>
+      <div className="relative">
+        <svg width="220" height="220" viewBox="0 0 220 220" className="-rotate-90">
+          <circle
+            cx="110"
+            cy="110"
+            r={radius}
+            fill="none"
+            stroke="rgba(34,197,94,0.1)"
+            strokeWidth="12"
+          />
+          <circle
+            cx="110"
+            cy="110"
+            r={radius}
+            fill="none"
+            stroke={color}
+            strokeWidth="12"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            className="transition-all duration-300"
+            style={{ filter: `drop-shadow(0 0 8px ${color}aa)` }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span
+            className="text-5xl font-bold"
+            style={{ color, fontFamily: "JetBrains Mono, monospace" }}
+          >
+            {animatedScore}
+          </span>
+          <span
+            className="mt-1 text-xs tracking-widest"
+            style={{ color: "rgba(212,244,225,0.4)" }}
+          >
+            / 100
+          </span>
+        </div>
       </div>
     </div>
   );

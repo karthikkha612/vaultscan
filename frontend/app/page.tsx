@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ScanInput from "@/components/ScanInput";
 import LoadingScanner from "@/components/LoadingScanner";
+import MatrixRain from "@/components/MatrixRain";
 import {
   isGithubUrl,
   saveScanResult,
@@ -129,8 +130,11 @@ export default function HomePage() {
     <>
       {isLoading && <LoadingScanner />}
 
+      {/* Matrix rain background */}
+      <MatrixRain />
+
       {/* Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>
         <div
           style={{
             position: "absolute",
@@ -223,7 +227,7 @@ export default function HomePage() {
         }
       `}</style>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-20">
+      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-20" style={{ zIndex: 2 }}>
 
         {/* Hero */}
         <section className="mb-16 text-center">

@@ -123,12 +123,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 5. Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
 6. Add environment variable: `GITHUB_TOKEN` (optional)
 
-## Screenshots
-
-<!-- Add screenshots here after deployment -->
-| Home | Results | History |
-| ---- | ------- | ------- |
-| _Screenshot placeholder_ | _Screenshot placeholder_ | _Screenshot placeholder_ |
 
 ## API Endpoints
 

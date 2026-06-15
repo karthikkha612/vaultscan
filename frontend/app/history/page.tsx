@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ScanResponse } from "@/lib/api";
 import { clearScanHistory, getScanHistory, setLatestScan } from "@/lib/api";
+import PingGrid from "@/components/pinggrid";
 
 const RISK_COLORS: Record<string, string> = {
   SAFE: "#22c55e",
@@ -19,10 +20,21 @@ export default function HistoryPage() {
   const [scans, setScans] = useState<ScanResponse[]>([]);
   const [mounted, setMounted] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     setMounted(true);
     setScans(getScanHistory());
+
+    const handleMouse = (e: MouseEvent) => {
+      if (window.innerWidth < 768) return;
+      setMouse({
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2,
+      });
+    };
+    window.addEventListener("mousemove", handleMouse);
+    return () => window.removeEventListener("mousemove", handleMouse);
   }, []);
 
   const handleClear = () => {
@@ -58,6 +70,39 @@ export default function HistoryPage() {
 
   return (
     <>
+      {/* Ping grid background */}
+      <PingGrid />
+
+      {/* Spotlight + scanline + corner accents */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>
+        {/* Spotlight */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: `radial-gradient(700px circle at ${50 + mouse.x * 20}% ${50 + mouse.y * 20}%, rgba(34,197,94,0.06), transparent 65%)`,
+          transition: "background 0.4s ease-out",
+        }} />
+        {/* Scanline overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage:
+            "repeating-linear-gradient(0deg, rgba(34,197,94,0.025) 0px, rgba(34,197,94,0.025) 1px, transparent 1px, transparent 3px)",
+          mixBlendMode: "overlay",
+        }} />
+        {/* Corner accents */}
+        <div style={{
+          position: "absolute", top: 0, left: 0,
+          width: "200px", height: "200px",
+          borderTop: "1px solid rgba(34,197,94,0.15)",
+          borderLeft: "1px solid rgba(34,197,94,0.15)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: 0, right: 0,
+          width: "200px", height: "200px",
+          borderBottom: "1px solid rgba(34,197,94,0.15)",
+          borderRight: "1px solid rgba(34,197,94,0.15)",
+        }} />
+      </div>
+
       <style>{`
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(12px); }
@@ -74,7 +119,7 @@ export default function HistoryPage() {
         }
       `}</style>
 
-      <div className="mx-auto max-w-4xl px-6 py-12">
+      <div className="relative mx-auto max-w-4xl px-6 py-12" style={{ zIndex: 2 }}>
 
         {/* Header */}
         <div style={{ marginBottom: "32px" }}>
@@ -142,7 +187,7 @@ export default function HistoryPage() {
               { label: "CRITICAL_FOUND", value: scans.filter(s => s.risk_level === "CRITICAL" || s.risk_level === "HIGH").length },
             ].map((stat, i) => (
               <div key={i} style={{
-                backgroundColor: "#0a0a0a", padding: "16px",
+                backgroundColor: "rgba(10,10,10,0.8)", backdropFilter: "blur(10px)", padding: "16px",
                 textAlign: "center",
               }}>
                 <div style={{
@@ -178,7 +223,7 @@ export default function HistoryPage() {
         {scans.length === 0 ? (
           <div style={{
             border: "1px solid #1a1a1a",
-            backgroundColor: "#0a0a0a",
+            backgroundColor: "rgba(10,10,10,0.8)", backdropFilter: "blur(10px)",
             borderRadius: "4px", padding: "64px 32px",
             textAlign: "center",
           }}>
@@ -224,7 +269,7 @@ export default function HistoryPage() {
                   style={{
                     border: "1px solid #1a1a1a",
                     borderLeft: `2px solid ${accent}`,
-                    backgroundColor: "#0a0a0a",
+                    backgroundColor: "rgba(10,10,10,0.8)", backdropFilter: "blur(10px)",
                     borderRadius: "2px",
                     padding: "16px 20px",
                     animationDelay: `${index * 50}ms`,

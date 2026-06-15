@@ -549,9 +549,6 @@ video {
 .mb-1{
   margin-bottom: 0.25rem;
 }
-.mb-1\.5{
-  margin-bottom: 0.375rem;
-}
 .mb-10{
   margin-bottom: 2.5rem;
 }
@@ -579,17 +576,11 @@ video {
 .ml-4{
   margin-left: 1rem;
 }
-.mt-0\.5{
-  margin-top: 0.125rem;
-}
 .mt-1{
   margin-top: 0.25rem;
 }
 .mt-16{
   margin-top: 4rem;
-}
-.mt-2{
-  margin-top: 0.5rem;
 }
 .mt-3{
   margin-top: 0.75rem;
@@ -608,6 +599,9 @@ video {
 }
 .grid{
   display: grid;
+}
+.hidden{
+  display: none;
 }
 .h-16{
   height: 4rem;
@@ -666,13 +660,6 @@ video {
 .flex-1{
   flex: 1 1 0%;
 }
-.shrink-0{
-  flex-shrink: 0;
-}
-.-rotate-90{
-  --tw-rotate: -90deg;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
 .transform{
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
@@ -720,9 +707,6 @@ video {
 }
 .flex-wrap{
   flex-wrap: wrap;
-}
-.items-start{
-  align-items: flex-start;
 }
 .items-center{
   align-items: center;
@@ -833,24 +817,14 @@ video {
 .p-12{
   padding: 3rem;
 }
-.p-3{
-  padding: 0.75rem;
-}
 .p-4{
   padding: 1rem;
-}
-.p-5{
-  padding: 1.25rem;
 }
 .p-6{
   padding: 1.5rem;
 }
 .p-8{
   padding: 2rem;
-}
-.px-2\.5{
-  padding-left: 0.625rem;
-  padding-right: 0.625rem;
 }
 .px-3{
   padding-left: 0.75rem;
@@ -921,17 +895,9 @@ video {
   font-size: 2.25rem;
   line-height: 2.5rem;
 }
-.text-5xl{
-  font-size: 3rem;
-  line-height: 1;
-}
 .text-base{
   font-size: 1rem;
   line-height: 1.5rem;
-}
-.text-lg{
-  font-size: 1.125rem;
-  line-height: 1.75rem;
 }
 .text-sm{
   font-size: 0.875rem;
@@ -965,9 +931,6 @@ video {
 }
 .tracking-tight{
   letter-spacing: -0.025em;
-}
-.tracking-wide{
-  letter-spacing: 0.025em;
 }
 .tracking-widest{
   letter-spacing: 0.1em;
@@ -1054,9 +1017,6 @@ video {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-}
-.duration-300{
-  transition-duration: 300ms;
 }
 .duration-500{
   transition-duration: 500ms;
@@ -1206,11 +1166,6 @@ body {
   .sm\:py-20{
     padding-top: 5rem;
     padding-bottom: 5rem;
-  }
-
-  .sm\:text-2xl{
-    font-size: 1.5rem;
-    line-height: 2rem;
   }
 
   .sm\:text-3xl{

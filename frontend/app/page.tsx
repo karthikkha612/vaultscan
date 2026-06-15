@@ -56,7 +56,7 @@ const FEATURE_CARDS = [
       </svg>
     ),
     delay: "200ms",
-    speed: 13,
+    speed: 9,
   },
 ];
 
@@ -87,15 +87,18 @@ export default function HomePage() {
     const t4 = setTimeout(() => setCardsVisible(true), 900);
     const t5 = setTimeout(() => setStatsVisible(true), 1100);
 
-    const handleMouse = (e: MouseEvent) => {
-      if (window.innerWidth < 768) return;
+    const handle = (e: MouseEvent) => {
+      if (window.innerWidth < 768) {
+        setMouse({ x: 0, y: 0 });
+        return;
+      }
       setMouse({
         x: (e.clientX / window.innerWidth - 0.5) * 2,
         y: (e.clientY / window.innerHeight - 0.5) * 2,
       });
     };
 
-    window.addEventListener("mousemove", handleMouse);
+    window.addEventListener("mousemove", handle);
 
     return () => {
       clearTimeout(t1);
@@ -103,7 +106,7 @@ export default function HomePage() {
       clearTimeout(t3);
       clearTimeout(t4);
       clearTimeout(t5);
-      window.removeEventListener("mousemove", handleMouse);
+      window.removeEventListener("mousemove", handle);
     };
   }, []);
 
@@ -207,6 +210,15 @@ export default function HomePage() {
         .card-hover:hover {
           border-color: rgba(34,197,94,0.5) !important;
           box-shadow: 0 0 25px rgba(34,197,94,0.15);
+        }
+        .card-hover:nth-child(1):hover {
+          transform: translate(${mouse.x * FEATURE_CARDS[0].speed}px, ${mouse.y * FEATURE_CARDS[0].speed}px) rotateX(2deg) rotateY(-2deg) !important;
+        }
+        .card-hover:nth-child(2):hover {
+          transform: translate(${mouse.x * FEATURE_CARDS[1].speed}px, ${mouse.y * FEATURE_CARDS[1].speed}px) rotateX(-1.5deg) rotateY(2deg) !important;
+        }
+        .card-hover:nth-child(3):hover {
+          transform: translate(${mouse.x * FEATURE_CARDS[2].speed}px, ${mouse.y * FEATURE_CARDS[2].speed}px) rotateX(2deg) rotateY(1.5deg) !important;
         }
         .card-hover:hover .card-icon {
           color: #22c55e !important;

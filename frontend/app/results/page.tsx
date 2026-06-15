@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import RiskGauge from "@/components/RiskGauge";
 import FindingCard from "@/components/FindingCard";
+import MatrixRain from "@/components/MatrixRain";
 import type { ScanResponse } from "@/lib/api";
 import { getLatestScan } from "@/lib/api";
 
@@ -74,13 +75,16 @@ export default function ResultsPage() {
 
   return (
     <>
-      {/* Same matrix background as home */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+      {/* Matrix rain background */}
+      <MatrixRain />
+
+      {/* Grid + spotlight + corner accents */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: `
-            linear-gradient(rgba(34,197,94,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(34,197,94,0.025) 1px, transparent 1px)
+            linear-gradient(rgba(34,197,94,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(34,197,94,0.05) 1px, transparent 1px)
           `,
           backgroundSize: "40px 40px",
           transform: `translate(${mouse.x * 4}px, ${mouse.y * 4}px)`,
@@ -89,8 +93,15 @@ export default function ResultsPage() {
         {/* Spotlight */}
         <div style={{
           position: "absolute", inset: 0,
-          background: `radial-gradient(700px circle at ${50 + mouse.x * 20}% ${50 + mouse.y * 20}%, rgba(34,197,94,0.04), transparent 65%)`,
+          background: `radial-gradient(700px circle at ${50 + mouse.x * 20}% ${50 + mouse.y * 20}%, rgba(34,197,94,0.06), transparent 65%)`,
           transition: "background 0.4s ease-out",
+        }} />
+        {/* Scanline overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage:
+            "repeating-linear-gradient(0deg, rgba(34,197,94,0.025) 0px, rgba(34,197,94,0.025) 1px, transparent 1px, transparent 3px)",
+          mixBlendMode: "overlay",
         }} />
         {/* Corner accents */}
         <div style={{
@@ -117,7 +128,7 @@ export default function ResultsPage() {
         }
       `}</style>
 
-      <div className="relative mx-auto max-w-6xl px-6 py-12" style={{ zIndex: 1 }}>
+      <div className="relative mx-auto max-w-6xl px-6 py-12" style={{ zIndex: 2 }}>
 
         {/* Top label */}
         <div className="flex items-center gap-3 mb-8">

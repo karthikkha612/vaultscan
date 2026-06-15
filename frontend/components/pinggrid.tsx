@@ -2,52 +2,63 @@
 
 import { useEffect, useRef } from "react";
 
-export default function PingGrid() {
+export default function PacketStream() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const dots: HTMLDivElement[] = [];
-    const cols = Math.ceil(window.innerWidth / 40);
-    const rows = Math.ceil(window.innerHeight / 40);
-    const count = 18;
+    const packets: HTMLDivElement[] = [];
+    const count = 22;
+    const height = window.innerHeight;
+    const width = window.innerWidth;
 
     for (let i = 0; i < count; i++) {
-      const dot = document.createElement("div");
-      const x = Math.floor(Math.random() * cols) * 40;
-      const y = Math.floor(Math.random() * rows) * 40;
-      const dur = 2.5 + Math.random() * 3;
-      const delay = Math.random() * 4;
+      const packet = document.createElement("div");
+      const top = Math.random() * height;
+      const dur = 4 + Math.random() * 6;
+      const delay = Math.random() * 8;
+      const w = 30 + Math.random() * 60;
+      const reverse = Math.random() > 0.5;
 
-      dot.style.position = "absolute";
-      dot.style.left = `${x}px`;
-      dot.style.top = `${y}px`;
-      dot.style.width = "6px";
-      dot.style.height = "6px";
-      dot.style.borderRadius = "50%";
-      dot.style.backgroundColor = "#22c55e";
-      dot.style.animation = `ping-pulse ${dur}s ease-in-out infinite`;
-      dot.style.animationDelay = `-${delay}s`;
-      dot.style.willChange = "opacity, transform";
+      packet.style.position = "absolute";
+      packet.style.top = `${top}px`;
+      packet.style.left = "0";
+      packet.style.width = `${w}px`;
+      packet.style.height = "2px";
+      packet.style.borderRadius = "1px";
+      packet.style.backgroundColor = "rgba(34,197,94,0.35)";
+      packet.style.boxShadow = "0 0 6px rgba(34,197,94,0.4)";
+      packet.style.animation = `${reverse ? "packet-flow-reverse" : "packet-flow"} ${dur}s linear infinite`;
+      packet.style.animationDelay = `-${delay}s`;
+      packet.style.willChange = "transform";
 
-      container.appendChild(dot);
-      dots.push(dot);
+      container.appendChild(packet);
+      packets.push(packet);
     }
 
+    void width;
+
     return () => {
-      dots.forEach((d) => d.remove());
+      packets.forEach((p) => p.remove());
     };
   }, []);
 
   return (
     <>
       <style>{`
-        @keyframes ping-pulse {
-          0% { opacity: 0; transform: scale(0.5); }
-          50% { opacity: 0.7; transform: scale(1.3); box-shadow: 0 0 12px rgba(34,197,94,0.6); }
-          100% { opacity: 0; transform: scale(0.5); }
+        @keyframes packet-flow {
+          from { transform: translateX(-100px); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          to { transform: translateX(110vw); opacity: 0; }
+        }
+        @keyframes packet-flow-reverse {
+          from { transform: translateX(110vw); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          to { transform: translateX(-100px); opacity: 0; }
         }
       `}</style>
       <div

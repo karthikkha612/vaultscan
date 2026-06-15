@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ScanResponse } from "@/lib/api";
 import { clearScanHistory, getScanHistory, setLatestScan } from "@/lib/api";
-import PingGrid from "@/components/pinggrid";
+import PacketStream from "@/components/pinggrid";
 
 const RISK_COLORS: Record<string, string> = {
   SAFE: "#22c55e",
@@ -70,8 +70,8 @@ export default function HistoryPage() {
 
   return (
     <>
-      {/* Ping grid background */}
-      <PingGrid />
+      {/* Packet stream background */}
+      <PacketStream />
 
       {/* Spotlight + scanline + corner accents */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>

@@ -20,7 +20,7 @@ export interface ScanResponse {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-const REQUEST_TIMEOUT = 30000;
+  const REQUEST_TIMEOUT = 60000;
 
 async function fetchWithTimeout(
   url: string,
@@ -76,7 +76,7 @@ export async function scanURL(url: string): Promise<ScanResponse> {
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === "AbortError") {
-        throw new Error("Scan timed out after 30 seconds");
+        throw new Error("Backend is waking up, please try again in 10 seconds");
       }
       if (error.message.includes("fetch")) {
         throw new Error(

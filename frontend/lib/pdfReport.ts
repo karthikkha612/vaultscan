@@ -2,7 +2,6 @@
 
 import type { ScanResponse, Finding } from "@/lib/api";
 
-// Risk colors matching the UI
 const RISK_HEX: Record<string, [number, number, number]> = {
   SAFE:     [34,  197, 94],
   LOW:      [132, 204, 22],
@@ -16,251 +15,263 @@ function riskColor(level: string): [number, number, number] {
 }
 
 export async function downloadPDFReport(scan: ScanResponse) {
-  // Dynamically import jsPDF so it's only loaded when needed
   const { jsPDF } = await import("jspdf");
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = 210;
   const pageH = 297;
-  const margin = 16;
+  const margin = 20;
   const contentW = pageW - margin * 2;
   let y = 0;
 
   // ─── helpers ────────────────────────────────────────────────────────────────
 
   function checkPageBreak(neededH: number) {
-    if (y + neededH > pageH - 20) {
+    if (y + neededH > pageH - 24) {
       doc.addPage();
-      drawPageBackground();
-      y = 20;
+      drawBackground();
+      drawFooter();
+      y = 24;
     }
   }
 
-  function drawPageBackground() {
-    // Dark background
+  function drawBackground() {
+    // Clean dark background — no grid
     doc.setFillColor(10, 14, 12);
     doc.rect(0, 0, pageW, pageH, "F");
-
-    // Subtle green grid lines
-    doc.setDrawColor(34, 197, 94);
-    doc.setLineWidth(0.08);
-    doc.setGState(doc.GState({ opacity: 0.08 }));
-    for (let gx = 0; gx < pageW; gx += 10) {
-      doc.line(gx, 0, gx, pageH);
-    }
-    for (let gy = 0; gy < pageH; gy += 10) {
-      doc.line(0, gy, pageW, gy);
-    }
-    doc.setGState(doc.GState({ opacity: 1 }));
-
-    // Corner accents top-left
-    doc.setDrawColor(34, 197, 94);
-    doc.setLineWidth(0.4);
-    doc.setGState(doc.GState({ opacity: 0.3 }));
-    doc.line(margin - 4, 8, margin - 4, 22);
-    doc.line(margin - 4, 8, margin + 10, 8);
-    // Corner accents bottom-right
-    doc.line(pageW - margin + 4, pageH - 8, pageW - margin + 4, pageH - 22);
-    doc.line(pageW - margin + 4, pageH - 8, pageW - margin - 10, pageH - 8);
-    doc.setGState(doc.GState({ opacity: 1 }));
   }
 
-  function monoLabel(text: string, x: number, yPos: number, size = 7, alpha = 0.4) {
-    doc.setFont("courier", "bold");
-    doc.setFontSize(size);
-    doc.setTextColor(34, 197, 94);
-    doc.setGState(doc.GState({ opacity: alpha }));
-    doc.text(text, x, yPos);
-    doc.setGState(doc.GState({ opacity: 1 }));
-  }
-
-  function monoText(text: string, x: number, yPos: number, size = 9, r = 212, g = 244, b = 225, alpha = 1) {
-    doc.setFont("courier", "normal");
-    doc.setFontSize(size);
-    doc.setTextColor(r, g, b);
-    doc.setGState(doc.GState({ opacity: alpha }));
-    doc.text(text, x, yPos);
-    doc.setGState(doc.GState({ opacity: 1 }));
-  }
-
-  function divider(yPos: number, alpha = 0.15) {
+  function drawFooter() {
+    // Thin green line above footer
     doc.setDrawColor(34, 197, 94);
     doc.setLineWidth(0.3);
-    doc.setGState(doc.GState({ opacity: alpha }));
+    doc.setGState(doc.GState({ opacity: 0.2 }));
+    doc.line(margin, pageH - 12, pageW - margin, pageH - 12);
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    doc.setFont("courier", "normal");
+    doc.setFontSize(6.5);
+    doc.setTextColor(229, 229, 229);
+    doc.setGState(doc.GState({ opacity: 0.25 }));
+    doc.text("VAULTSCAN // DEVLYNIX BUILDATHON 2.0", margin, pageH - 7);
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    doc.setTextColor(34, 197, 94);
+    doc.setGState(doc.GState({ opacity: 0.35 }));
+    doc.text("TRACK_02 // CYBERSECURITY", pageW - margin, pageH - 7, { align: "right" });
+    doc.setGState(doc.GState({ opacity: 1 }));
+  }
+
+  function divider(yPos: number, opacity = 0.12) {
+    doc.setDrawColor(34, 197, 94);
+    doc.setLineWidth(0.3);
+    doc.setGState(doc.GState({ opacity }));
     doc.line(margin, yPos, pageW - margin, yPos);
     doc.setGState(doc.GState({ opacity: 1 }));
   }
 
-  function wrappedText(
+  function wrappedMono(
     text: string,
     x: number,
     yPos: number,
     maxW: number,
     size = 8,
     r = 212, g = 244, b = 225,
-    alpha = 0.6,
+    opacity = 0.6,
     lineH = 4.5
   ): number {
     doc.setFont("courier", "normal");
     doc.setFontSize(size);
     doc.setTextColor(r, g, b);
-    doc.setGState(doc.GState({ opacity: alpha }));
-    const lines = doc.splitTextToSize(text, maxW);
+    doc.setGState(doc.GState({ opacity }));
+    const lines = doc.splitTextToSize(text, maxW) as string[];
     doc.text(lines, x, yPos);
     doc.setGState(doc.GState({ opacity: 1 }));
     return lines.length * lineH;
   }
 
-  // ─── page 1 background ──────────────────────────────────────────────────────
-  drawPageBackground();
+  // ─── page 1 ─────────────────────────────────────────────────────────────────
+  drawBackground();
+  drawFooter();
 
-  // ─── header bar ─────────────────────────────────────────────────────────────
-  y = 16;
+  // ─── header ─────────────────────────────────────────────────────────────────
+  y = 20;
+
+  // Left green accent bar for header
   doc.setFillColor(34, 197, 94);
-  doc.setGState(doc.GState({ opacity: 0.08 }));
-  doc.rect(margin, y - 6, contentW, 18, "F");
-  doc.setGState(doc.GState({ opacity: 1 }));
+  doc.rect(margin, y - 6, 3, 14, "F");
 
-  // Shield icon (simple polygon)
-  doc.setFillColor(34, 197, 94);
-  doc.setGState(doc.GState({ opacity: 0.9 }));
-  doc.triangle(margin + 2, y + 2, margin + 7, y - 4, margin + 12, y + 2, "F");
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  // VAULTSCAN title
+  // VAULTSCAN wordmark
   doc.setFont("courier", "bold");
-  doc.setFontSize(22);
+  doc.setFontSize(20);
   doc.setTextColor(34, 197, 94);
-  doc.text("VAULTSCAN", margin + 16, y + 4);
+  doc.text("VAULTSCAN", margin + 7, y + 3);
 
-  // Right-side label
-  monoLabel("SECURITY_REPORT", pageW - margin - 36, y + 1, 7, 0.5);
-  monoLabel("DEVLYNIX BUILDATHON 2.0", pageW - margin - 36, y + 6, 6, 0.3);
+  // Right labels
+  doc.setFont("courier", "normal");
+  doc.setFontSize(7);
+  doc.setTextColor(212, 244, 225);
+  doc.setGState(doc.GState({ opacity: 0.35 }));
+  doc.text("SECURITY_REPORT", pageW - margin, y - 1, { align: "right" });
+  doc.text("DEVLYNIX BUILDATHON 2.0", pageW - margin, y + 4, { align: "right" });
+  doc.setGState(doc.GState({ opacity: 1 }));
 
-  y += 18;
-  divider(y);
-  y += 8;
+  y += 12;
+  divider(y, 0.2);
+  y += 10;
 
-  // ─── scan meta block ────────────────────────────────────────────────────────
-  monoLabel("$ SCAN_RESULTS", margin, y, 7, 0.6);
+  // ─── scan meta ──────────────────────────────────────────────────────────────
+
+  // $ SCAN_RESULTS label
+  doc.setFont("courier", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(34, 197, 94);
+  doc.setGState(doc.GState({ opacity: 0.55 }));
+  doc.text("$ SCAN_RESULTS", margin, y);
+  doc.setGState(doc.GState({ opacity: 1 }));
   y += 6;
 
   // Target URL
   doc.setFont("courier", "bold");
-  doc.setFontSize(10);
+  doc.setFontSize(11);
   doc.setTextColor(212, 244, 225);
-  const targetDisplay = scan.target.length > 70 ? scan.target.slice(0, 70) + "..." : scan.target;
-  doc.text(targetDisplay, margin, y);
-  y += 6;
+  const target = scan.target.length > 65 ? scan.target.slice(0, 65) + "..." : scan.target;
+  doc.text(target, margin, y);
+  y += 7;
 
-  // Meta row
-  const dateStr = new Date(scan.scanned_at).toLocaleString();
-  monoText(`${dateStr}  ·  ${scan.scan_type.toUpperCase()}_SCAN`, margin, y, 8, 212, 244, 225, 0.4);
+  // Date + scan type
+  doc.setFont("courier", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(212, 244, 225);
+  doc.setGState(doc.GState({ opacity: 0.4 }));
+  doc.text(`${new Date(scan.scanned_at).toLocaleString()}  ·  ${scan.scan_type.toUpperCase()}_SCAN`, margin, y);
+  doc.setGState(doc.GState({ opacity: 1 }));
   y += 8;
 
   // Risk badge
   const [rr, rg, rb] = riskColor(scan.risk_level);
+  const badgeW = scan.risk_level.length * 2.4 + 10;
   doc.setFillColor(rr, rg, rb);
-  doc.setGState(doc.GState({ opacity: 0.15 }));
-  doc.roundedRect(margin, y - 4, 28, 7, 1, 1, "F");
+  doc.setGState(doc.GState({ opacity: 0.12 }));
+  doc.roundedRect(margin, y - 4, badgeW, 7, 1, 1, "F");
   doc.setGState(doc.GState({ opacity: 1 }));
   doc.setDrawColor(rr, rg, rb);
-  doc.setLineWidth(0.3);
-  doc.setGState(doc.GState({ opacity: 0.4 }));
-  doc.roundedRect(margin, y - 4, 28, 7, 1, 1, "S");
+  doc.setLineWidth(0.4);
+  doc.setGState(doc.GState({ opacity: 0.45 }));
+  doc.roundedRect(margin, y - 4, badgeW, 7, 1, 1, "S");
   doc.setGState(doc.GState({ opacity: 1 }));
   doc.setFont("courier", "bold");
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(rr, rg, rb);
-  doc.text(scan.risk_level, margin + 4, y + 0.5);
-
+  doc.text(scan.risk_level, margin + 5, y + 0.5);
   y += 12;
-  divider(y);
-  y += 8;
 
-  // ─── score gauge (text-based) ───────────────────────────────────────────────
-  monoLabel("RISK_SCORE", margin, y, 7, 0.5);
+  divider(y, 0.15);
+  y += 10;
+
+  // ─── score section ──────────────────────────────────────────────────────────
+  doc.setFont("courier", "normal");
+  doc.setFontSize(7);
+  doc.setTextColor(212, 244, 225);
+  doc.setGState(doc.GState({ opacity: 0.35 }));
+  doc.text("RISK_SCORE", margin, y);
+  doc.setGState(doc.GState({ opacity: 1 }));
   y += 5;
 
+  // Big score number
   doc.setFont("courier", "bold");
-  doc.setFontSize(36);
+  doc.setFontSize(40);
   doc.setTextColor(rr, rg, rb);
-  doc.text(`${scan.overall_score}`, margin, y + 8);
+  doc.text(`${scan.overall_score}`, margin, y + 10);
 
+  // / 100
   doc.setFont("courier", "normal");
-  doc.setFontSize(10);
+  doc.setFontSize(11);
   doc.setTextColor(212, 244, 225);
-  doc.setGState(doc.GState({ opacity: 0.4 }));
-  doc.text("/ 100", margin + 22, y + 8);
+  doc.setGState(doc.GState({ opacity: 0.3 }));
+  doc.text("/ 100", margin + 26, y + 10);
   doc.setGState(doc.GState({ opacity: 1 }));
 
-  // Score bar
-  const barX = margin + 45;
-  const barY = y + 4;
-  const barW = contentW - 48;
-  const barH = 6;
+  // Score bar — clean, no labels cluttering
+  const barX = margin + 55;
+  const barY = y + 5;
+  const barW = contentW - 58;
+  const barH = 5;
+  // Track
   doc.setFillColor(34, 197, 94);
-  doc.setGState(doc.GState({ opacity: 0.08 }));
-  doc.roundedRect(barX, barY, barW, barH, 2, 2, "F");
+  doc.setGState(doc.GState({ opacity: 0.07 }));
+  doc.roundedRect(barX, barY, barW, barH, 1.5, 1.5, "F");
   doc.setGState(doc.GState({ opacity: 1 }));
+  // Fill
   doc.setFillColor(rr, rg, rb);
-  doc.setGState(doc.GState({ opacity: 0.8 }));
-  doc.roundedRect(barX, barY, (scan.overall_score / 100) * barW, barH, 2, 2, "F");
+  doc.setGState(doc.GState({ opacity: 0.75 }));
+  doc.roundedRect(barX, barY, Math.max((scan.overall_score / 100) * barW, 2), barH, 1.5, 1.5, "F");
+  doc.setGState(doc.GState({ opacity: 1 }));
+  // Min/max labels
+  doc.setFont("courier", "normal");
+  doc.setFontSize(6);
+  doc.setTextColor(212, 244, 225);
+  doc.setGState(doc.GState({ opacity: 0.25 }));
+  doc.text("0", barX, barY + 10);
+  doc.text("100", barX + barW - 5, barY + 10);
   doc.setGState(doc.GState({ opacity: 1 }));
 
-  // Score labels
-  monoText("0", barX, barY + 11, 6, 212, 244, 225, 0.3);
-  monoText("50", barX + barW / 2 - 3, barY + 11, 6, 212, 244, 225, 0.3);
-  monoText("100", barX + barW - 8, barY + 11, 6, 212, 244, 225, 0.3);
+  y += 20;
+  divider(y, 0.15);
+  y += 10;
 
-  y += 22;
-  divider(y);
-  y += 8;
+  // ─── findings header ────────────────────────────────────────────────────────
+  doc.setFont("courier", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(34, 197, 94);
+  doc.text(`> FINDINGS (${scan.findings.length})`, margin, y);
 
-  // ─── findings count summary ──────────────────────────────────────────────────
-  const counts: Record<string, number> = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, SAFE: 0 };
+  // Severity summary on same line
+  const counts: Record<string, number> = {};
   scan.findings.forEach(f => { counts[f.risk_level] = (counts[f.risk_level] || 0) + 1; });
-
-  monoLabel(`> FINDINGS (${scan.findings.length})`, margin, y, 8, 0.7);
-  y += 6;
-
-  // Summary pills
-  let pillX = margin;
+  let summaryX = margin + 40;
   ["CRITICAL", "HIGH", "MEDIUM", "LOW"].forEach(level => {
-    if (counts[level] > 0) {
-      const [pr, pg, pb] = riskColor(level);
-      const pillW = level.length * 2.2 + 14;
-      doc.setFillColor(pr, pg, pb);
-      doc.setGState(doc.GState({ opacity: 0.12 }));
-      doc.roundedRect(pillX, y - 3.5, pillW, 6, 1, 1, "F");
-      doc.setGState(doc.GState({ opacity: 1 }));
-      doc.setFont("courier", "bold");
+    if (counts[level]) {
+      const [lr, lg, lb] = riskColor(level);
+      doc.setFont("courier", "normal");
       doc.setFontSize(7);
-      doc.setTextColor(pr, pg, pb);
-      doc.text(`${level}: ${counts[level]}`, pillX + 2, y + 0.5);
-      pillX += pillW + 3;
+      doc.setTextColor(lr, lg, lb);
+      doc.text(`${level}: ${counts[level]}`, summaryX, y);
+      summaryX += level.length * 2.2 + 10;
     }
   });
 
   y += 10;
 
   // ─── finding cards ──────────────────────────────────────────────────────────
+  if (scan.findings.length === 0) {
+    checkPageBreak(16);
+    doc.setFont("courier", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(34, 197, 94);
+    doc.text("[ NO_VULNERABILITIES_DETECTED ]", pageW / 2, y + 6, { align: "center" });
+    y += 16;
+  }
+
   scan.findings.forEach((finding: Finding, index: number) => {
-    const cardH = 42 + Math.ceil(finding.description.length / 80) * 4.5 + Math.ceil(finding.recommendation.length / 80) * 4.5;
-    checkPageBreak(cardH);
+    // Estimate card height
+    const descLines = doc.splitTextToSize(finding.description, contentW - 12) as string[];
+    const recLines = doc.splitTextToSize(finding.recommendation, contentW - 16) as string[];
+    const cardH = 14 + descLines.length * 4.5 + 8 + recLines.length * 4.5 + 8;
+
+    checkPageBreak(cardH + 6);
 
     const [fr, fg, fb] = riskColor(finding.risk_level);
     const tag = String(index + 1).padStart(2, "0");
 
     // Card background
     doc.setFillColor(15, 21, 18);
-    doc.setGState(doc.GState({ opacity: 0.9 }));
-    doc.roundedRect(margin, y, contentW, cardH, 2, 2, "F");
     doc.setGState(doc.GState({ opacity: 1 }));
+    doc.roundedRect(margin, y, contentW, cardH, 2, 2, "F");
 
-    // Left accent bar
+    // Left accent bar (severity color)
     doc.setFillColor(fr, fg, fb);
-    doc.roundedRect(margin, y, 2, cardH, 1, 1, "F");
+    doc.roundedRect(margin, y, 2.5, cardH, 1, 1, "F");
 
     // Card border
     doc.setDrawColor(26, 38, 32);
@@ -268,81 +279,96 @@ export async function downloadPDFReport(scan: ScanResponse) {
     doc.roundedRect(margin, y, contentW, cardH, 2, 2, "S");
 
     // Index tag
-    monoText(`[${tag}]`, margin + 5, y + 7, 7, 212, 244, 225, 0.25);
+    doc.setFont("courier", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(212, 244, 225);
+    doc.setGState(doc.GState({ opacity: 0.22 }));
+    doc.text(`[${tag}]`, margin + 6, y + 8);
+    doc.setGState(doc.GState({ opacity: 1 }));
 
     // Title
     doc.setFont("courier", "bold");
-    doc.setFontSize(9);
+    doc.setFontSize(9.5);
     doc.setTextColor(212, 244, 225);
-    doc.text(finding.title, margin + 16, y + 7);
+    doc.text(finding.title, margin + 16, y + 8);
 
-    // Severity badge
+    // Severity badge — top right
+    const bw = finding.risk_level.length * 2.2 + 8;
     doc.setFillColor(fr, fg, fb);
-    doc.setGState(doc.GState({ opacity: 0.15 }));
-    const badgeW = finding.risk_level.length * 2.2 + 8;
-    doc.roundedRect(pageW - margin - badgeW - 2, y + 2, badgeW, 6, 1, 1, "F");
+    doc.setGState(doc.GState({ opacity: 0.12 }));
+    doc.roundedRect(pageW - margin - bw - 2, y + 2.5, bw, 6, 1, 1, "F");
+    doc.setGState(doc.GState({ opacity: 1 }));
+    doc.setDrawColor(fr, fg, fb);
+    doc.setLineWidth(0.3);
+    doc.setGState(doc.GState({ opacity: 0.4 }));
+    doc.roundedRect(pageW - margin - bw - 2, y + 2.5, bw, 6, 1, 1, "S");
     doc.setGState(doc.GState({ opacity: 1 }));
     doc.setFont("courier", "bold");
     doc.setFontSize(7);
     doc.setTextColor(fr, fg, fb);
-    doc.text(finding.risk_level, pageW - margin - badgeW + 1, y + 6.5);
+    doc.text(finding.risk_level, pageW - margin - bw + 1, y + 7);
 
-    // Divider under title
+    // Thin divider under title
     doc.setDrawColor(26, 38, 32);
     doc.setLineWidth(0.2);
-    doc.setGState(doc.GState({ opacity: 0.5 }));
-    doc.line(margin + 4, y + 10, pageW - margin - 4, y + 10);
+    doc.setGState(doc.GState({ opacity: 0.6 }));
+    doc.line(margin + 5, y + 11, pageW - margin - 5, y + 11);
     doc.setGState(doc.GState({ opacity: 1 }));
 
     // Description
-    const descH = wrappedText(finding.description, margin + 5, y + 16, contentW - 10, 8, 212, 244, 225, 0.55);
+    let innerY = y + 16;
+    doc.setFont("courier", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(212, 244, 225);
+    doc.setGState(doc.GState({ opacity: 0.55 }));
+    doc.text(descLines, margin + 6, innerY);
+    doc.setGState(doc.GState({ opacity: 1 }));
+    innerY += descLines.length * 4.5 + 5;
 
     // Recommendation box
-    const recY = y + 16 + descH + 2;
+    const recBoxH = recLines.length * 4.5 + 9;
     doc.setFillColor(34, 197, 94);
     doc.setGState(doc.GState({ opacity: 0.04 }));
-    doc.roundedRect(margin + 4, recY - 4, contentW - 8, cardH - (recY - y) - 2, 1, 1, "F");
+    doc.roundedRect(margin + 5, innerY - 3, contentW - 10, recBoxH, 1, 1, "F");
     doc.setGState(doc.GState({ opacity: 1 }));
     doc.setDrawColor(34, 197, 94);
     doc.setLineWidth(0.2);
-    doc.setGState(doc.GState({ opacity: 0.15 }));
-    doc.roundedRect(margin + 4, recY - 4, contentW - 8, cardH - (recY - y) - 2, 1, 1, "S");
+    doc.setGState(doc.GState({ opacity: 0.12 }));
+    doc.roundedRect(margin + 5, innerY - 3, contentW - 10, recBoxH, 1, 1, "S");
     doc.setGState(doc.GState({ opacity: 1 }));
 
-    monoText("> RECOMMENDATION", margin + 7, recY + 1, 7, 34, 197, 94, 0.8);
-    wrappedText(finding.recommendation, margin + 7, recY + 6, contentW - 14, 7.5, 212, 244, 225, 0.65);
+    // > RECOMMENDATION label
+    doc.setFont("courier", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(34, 197, 94);
+    doc.setGState(doc.GState({ opacity: 0.75 }));
+    doc.text("> RECOMMENDATION", margin + 9, innerY + 3);
+    doc.setGState(doc.GState({ opacity: 1 }));
+    innerY += 7;
+
+    // Recommendation text
+    doc.setFont("courier", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(212, 244, 225);
+    doc.setGState(doc.GState({ opacity: 0.65 }));
+    doc.text(recLines, margin + 9, innerY);
+    doc.setGState(doc.GState({ opacity: 1 }));
 
     y += cardH + 5;
   });
 
-  // ─── empty state ────────────────────────────────────────────────────────────
-  if (scan.findings.length === 0) {
-    checkPageBreak(20);
-    doc.setFillColor(34, 197, 94);
-    doc.setGState(doc.GState({ opacity: 0.04 }));
-    doc.roundedRect(margin, y, contentW, 16, 2, 2, "F");
-    doc.setGState(doc.GState({ opacity: 1 }));
-    doc.setFont("courier", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(34, 197, 94);
-    doc.text("[ NO_VULNERABILITIES_DETECTED ]", margin + contentW / 2, y + 9, { align: "center" });
-    y += 20;
-  }
-
-  // ─── footer on last page ────────────────────────────────────────────────────
-  checkPageBreak(16);
-  divider(pageH - 14);
-  monoText("VAULTSCAN // DEVLYNIX BUILDATHON 2.0", margin, pageH - 8, 7, 229, 229, 229, 0.2);
-  monoText("TRACK_02 // CYBERSECURITY", pageW - margin, pageH - 8, 7, 34, 197, 94, 0.3);
-
   // ─── page numbers ───────────────────────────────────────────────────────────
-  const totalPages = (doc as any).internal.getNumberOfPages();
-  for (let p = 1; p <= totalPages; p++) {
+  const total = (doc as any).internal.getNumberOfPages();
+  for (let p = 1; p <= total; p++) {
     doc.setPage(p);
-    monoText(`${p} / ${totalPages}`, pageW / 2, pageH - 6, 6, 212, 244, 225, 0.2);
+    doc.setFont("courier", "normal");
+    doc.setFontSize(6.5);
+    doc.setTextColor(212, 244, 225);
+    doc.setGState(doc.GState({ opacity: 0.2 }));
+    doc.text(`${p} / ${total}`, pageW / 2, pageH - 7, { align: "center" });
+    doc.setGState(doc.GState({ opacity: 1 }));
   }
 
   // ─── save ───────────────────────────────────────────────────────────────────
-  const filename = `vaultscan-report-${Date.now()}.pdf`;
-  doc.save(filename);
+  doc.save(`vaultscan-report-${Date.now()}.pdf`);
 }

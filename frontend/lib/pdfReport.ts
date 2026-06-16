@@ -45,19 +45,19 @@ export async function downloadPDFReport(scan: ScanResponse) {
     // Thin green line above footer
     doc.setDrawColor(34, 197, 94);
     doc.setLineWidth(0.3);
-    doc.setGState(doc.GState({ opacity: 0.2 }));
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.line(margin, pageH - 12, pageW - margin, pageH - 12);
     doc.setGState(doc.GState({ opacity: 1 }));
 
     doc.setFont("courier", "normal");
     doc.setFontSize(6.5);
-    doc.setTextColor(229, 229, 229);
-    doc.setGState(doc.GState({ opacity: 0.25 }));
+    doc.setTextColor(255, 255, 255);
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.text("VAULTSCAN // DEVLYNIX BUILDATHON 2.0", margin, pageH - 7);
     doc.setGState(doc.GState({ opacity: 1 }));
 
     doc.setTextColor(34, 197, 94);
-    doc.setGState(doc.GState({ opacity: 0.35 }));
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.text("TRACK_02 // CYBERSECURITY", pageW - margin, pageH - 7, { align: "right" });
     doc.setGState(doc.GState({ opacity: 1 }));
   }
@@ -76,8 +76,8 @@ export async function downloadPDFReport(scan: ScanResponse) {
     yPos: number,
     maxW: number,
     size = 8,
-    r = 212, g = 244, b = 225,
-    opacity = 0.6,
+    r = 255, g = 255, b = 255,
+    opacity = 1,
     lineH = 4.5
   ): number {
     doc.setFont("courier", "normal");
@@ -110,8 +110,8 @@ export async function downloadPDFReport(scan: ScanResponse) {
   // Right labels
   doc.setFont("courier", "normal");
   doc.setFontSize(7);
-  doc.setTextColor(212, 244, 225);
-  doc.setGState(doc.GState({ opacity: 0.35 }));
+  doc.setTextColor(255, 255, 255);
+  doc.setGState(doc.GState({ opacity: 1 }));
   doc.text("SECURITY_REPORT", pageW - margin, y - 1, { align: "right" });
   doc.text("DEVLYNIX BUILDATHON 2.0", pageW - margin, y + 4, { align: "right" });
   doc.setGState(doc.GState({ opacity: 1 }));
@@ -126,7 +126,7 @@ export async function downloadPDFReport(scan: ScanResponse) {
   doc.setFont("courier", "normal");
   doc.setFontSize(7.5);
   doc.setTextColor(34, 197, 94);
-  doc.setGState(doc.GState({ opacity: 0.55 }));
+  doc.setGState(doc.GState({ opacity: 1 }));
   doc.text("$ SCAN_RESULTS", margin, y);
   doc.setGState(doc.GState({ opacity: 1 }));
   y += 6;
@@ -134,7 +134,7 @@ export async function downloadPDFReport(scan: ScanResponse) {
   // Target URL
   doc.setFont("courier", "bold");
   doc.setFontSize(11);
-  doc.setTextColor(212, 244, 225);
+  doc.setTextColor(255, 255, 255);
   const target = scan.target.length > 65 ? scan.target.slice(0, 65) + "..." : scan.target;
   doc.text(target, margin, y);
   y += 7;
@@ -142,8 +142,8 @@ export async function downloadPDFReport(scan: ScanResponse) {
   // Date + scan type
   doc.setFont("courier", "normal");
   doc.setFontSize(8);
-  doc.setTextColor(212, 244, 225);
-  doc.setGState(doc.GState({ opacity: 0.4 }));
+  doc.setTextColor(255, 255, 255);
+  doc.setGState(doc.GState({ opacity: 1 }));
   doc.text(`${new Date(scan.scanned_at).toLocaleString()}  ·  ${scan.scan_type.toUpperCase()}_SCAN`, margin, y);
   doc.setGState(doc.GState({ opacity: 1 }));
   y += 8;
@@ -172,8 +172,8 @@ export async function downloadPDFReport(scan: ScanResponse) {
   // ─── score section ──────────────────────────────────────────────────────────
   doc.setFont("courier", "normal");
   doc.setFontSize(7);
-  doc.setTextColor(212, 244, 225);
-  doc.setGState(doc.GState({ opacity: 0.35 }));
+  doc.setTextColor(255, 255, 255);
+  doc.setGState(doc.GState({ opacity: 1 }));
   doc.text("RISK_SCORE", margin, y);
   doc.setGState(doc.GState({ opacity: 1 }));
   y += 5;
@@ -187,8 +187,8 @@ export async function downloadPDFReport(scan: ScanResponse) {
   // / 100
   doc.setFont("courier", "normal");
   doc.setFontSize(11);
-  doc.setTextColor(212, 244, 225);
-  doc.setGState(doc.GState({ opacity: 0.3 }));
+  doc.setTextColor(255, 255, 255);
+  doc.setGState(doc.GState({ opacity: 1 }));
   doc.text("/ 100", margin + 26, y + 10);
   doc.setGState(doc.GState({ opacity: 1 }));
 
@@ -204,14 +204,14 @@ export async function downloadPDFReport(scan: ScanResponse) {
   doc.setGState(doc.GState({ opacity: 1 }));
   // Fill
   doc.setFillColor(rr, rg, rb);
-  doc.setGState(doc.GState({ opacity: 0.75 }));
+  doc.setGState(doc.GState({ opacity: 1 }));
   doc.roundedRect(barX, barY, Math.max((scan.overall_score / 100) * barW, 2), barH, 1.5, 1.5, "F");
   doc.setGState(doc.GState({ opacity: 1 }));
   // Min/max labels
   doc.setFont("courier", "normal");
   doc.setFontSize(6);
-  doc.setTextColor(212, 244, 225);
-  doc.setGState(doc.GState({ opacity: 0.25 }));
+  doc.setTextColor(255, 255, 255);
+  doc.setGState(doc.GState({ opacity: 1 }));
   doc.text("0", barX, barY + 10);
   doc.text("100", barX + barW - 5, barY + 10);
   doc.setGState(doc.GState({ opacity: 1 }));
@@ -281,15 +281,15 @@ export async function downloadPDFReport(scan: ScanResponse) {
     // Index tag
     doc.setFont("courier", "normal");
     doc.setFontSize(7);
-    doc.setTextColor(212, 244, 225);
-    doc.setGState(doc.GState({ opacity: 0.22 }));
+    doc.setTextColor(255, 255, 255);
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.text(`[${tag}]`, margin + 6, y + 8);
     doc.setGState(doc.GState({ opacity: 1 }));
 
     // Title
     doc.setFont("courier", "bold");
     doc.setFontSize(9.5);
-    doc.setTextColor(212, 244, 225);
+    doc.setTextColor(255, 255, 255);
     doc.text(finding.title, margin + 16, y + 8);
 
     // Severity badge — top right
@@ -300,7 +300,7 @@ export async function downloadPDFReport(scan: ScanResponse) {
     doc.setGState(doc.GState({ opacity: 1 }));
     doc.setDrawColor(fr, fg, fb);
     doc.setLineWidth(0.3);
-    doc.setGState(doc.GState({ opacity: 0.4 }));
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.roundedRect(pageW - margin - bw - 2, y + 2.5, bw, 6, 1, 1, "S");
     doc.setGState(doc.GState({ opacity: 1 }));
     doc.setFont("courier", "bold");
@@ -311,7 +311,7 @@ export async function downloadPDFReport(scan: ScanResponse) {
     // Thin divider under title
     doc.setDrawColor(26, 38, 32);
     doc.setLineWidth(0.2);
-    doc.setGState(doc.GState({ opacity: 0.6 }));
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.line(margin + 5, y + 11, pageW - margin - 5, y + 11);
     doc.setGState(doc.GState({ opacity: 1 }));
 
@@ -319,8 +319,8 @@ export async function downloadPDFReport(scan: ScanResponse) {
     let innerY = y + 16;
     doc.setFont("courier", "normal");
     doc.setFontSize(8);
-    doc.setTextColor(212, 244, 225);
-    doc.setGState(doc.GState({ opacity: 0.55 }));
+    doc.setTextColor(255, 255, 255);
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.text(descLines, margin + 6, innerY);
     doc.setGState(doc.GState({ opacity: 1 }));
     innerY += descLines.length * 4.5 + 5;
@@ -341,7 +341,7 @@ export async function downloadPDFReport(scan: ScanResponse) {
     doc.setFont("courier", "bold");
     doc.setFontSize(7);
     doc.setTextColor(34, 197, 94);
-    doc.setGState(doc.GState({ opacity: 0.75 }));
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.text("> RECOMMENDATION", margin + 9, innerY + 3);
     doc.setGState(doc.GState({ opacity: 1 }));
     innerY += 7;
@@ -349,8 +349,8 @@ export async function downloadPDFReport(scan: ScanResponse) {
     // Recommendation text
     doc.setFont("courier", "normal");
     doc.setFontSize(7.5);
-    doc.setTextColor(212, 244, 225);
-    doc.setGState(doc.GState({ opacity: 0.65 }));
+    doc.setTextColor(255, 255, 255);
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.text(recLines, margin + 9, innerY);
     doc.setGState(doc.GState({ opacity: 1 }));
 
@@ -363,8 +363,8 @@ export async function downloadPDFReport(scan: ScanResponse) {
     doc.setPage(p);
     doc.setFont("courier", "normal");
     doc.setFontSize(6.5);
-    doc.setTextColor(212, 244, 225);
-    doc.setGState(doc.GState({ opacity: 0.2 }));
+    doc.setTextColor(255, 255, 255);
+    doc.setGState(doc.GState({ opacity: 1 }));
     doc.text(`${p} / ${total}`, pageW / 2, pageH - 7, { align: "center" });
     doc.setGState(doc.GState({ opacity: 1 }));
   }

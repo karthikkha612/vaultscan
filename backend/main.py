@@ -1,6 +1,8 @@
+import asyncio
 import os
 from pathlib import Path
 
+import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,7 +35,25 @@ async def health_check():
     return {"status": "healthy", "service": "VaultScan API"}
 
 
+async def keep_alive():
+    """Self-ping every 10 minutes to prevent Render free tier sleep."""
+    await asyncio.sleep(30)  # wait 30 secs after startup before first ping
+    while True:
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                await client.get(
+                    "https://vaultscan-backend-q36e.onrender.com/api/health"
+                )
+        except Exception:
+            pass  # silently ignore errors
+        await asyncio.sleep(600)  # ping every 10 minutes
+
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(keep_alive())
+
+
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

@@ -8,6 +8,7 @@ import FindingCard from "@/components/FindingCard";
 import MatrixRain from "@/components/MatrixRain";
 import type { ScanResponse } from "@/lib/api";
 import { getLatestScan } from "@/lib/api";
+import { downloadPDFReport } from "@/lib/pdfReport";
 
 const RISK_COLORS: Record<string, string> = {
   SAFE: "#22c55e",
@@ -22,6 +23,7 @@ export default function ResultsPage() {
   const [scan, setScan] = useState<ScanResponse | null>(null);
   const [mounted, setMounted] = useState(false);
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -72,6 +74,15 @@ export default function ResultsPage() {
   const highCount = scan.findings.filter(f => f.risk_level === "HIGH").length;
   const mediumCount = scan.findings.filter(f => f.risk_level === "MEDIUM").length;
   const lowCount = scan.findings.filter(f => f.risk_level === "LOW").length;
+
+  const handleDownloadPDF = async () => {
+    setDownloading(true);
+    try {
+      await downloadPDFReport(scan);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <>
@@ -310,6 +321,26 @@ export default function ResultsPage() {
           >
             [ VIEW_HISTORY ]
           </Link>
+          <button
+            onClick={handleDownloadPDF}
+            disabled={downloading}
+            style={{
+              padding: "12px 24px",
+              border: "1px solid rgba(34,197,94,0.2)",
+              backgroundColor: downloading ? "rgba(34,197,94,0.1)" : "rgba(34,197,94,0.04)",
+              color: "#22c55e",
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.15em",
+              borderRadius: "2px",
+              fontFamily: "JetBrains Mono, monospace",
+              cursor: downloading ? "not-allowed" : "pointer",
+              opacity: downloading ? 0.6 : 1,
+              transition: "all 0.2s ease",
+            }}
+          >
+            {downloading ? "[ GENERATING... ]" : "[ DOWNLOAD_REPORT ]"}
+          </button>
         </div>
 
         {/* Footer */}

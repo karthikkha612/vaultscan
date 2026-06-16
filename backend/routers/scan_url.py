@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
@@ -26,15 +27,31 @@ def _validate_url(url: str) -> str:
     return url
 
 
+async def _run_scan_headers(url: str):
+    """Run header scanner in a thread so it doesn't block the event loop."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, scan_headers, url)
+
+
+async def _run_scan_xss(url: str):
+    """Run XSS scanner in a thread so it doesn't block the event loop."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, scan_xss, url)
+
+
 @router.post("/url", response_model=ScanResponse)
 async def scan_url(request: ScanURLRequest):
     try:
         url = _validate_url(request.url)
 
-        findings = []
-        findings.extend(scan_headers(url))
-        findings.extend(scan_xss(url))
+        # Run both scanners concurrently instead of sequentially
+        # This cuts scan time roughly in half since both make independent HTTP requests
+        header_findings, xss_findings = await asyncio.gather(
+            _run_scan_headers(url),
+            _run_scan_xss(url),
+        )
 
+        findings = list(header_findings) + list(xss_findings)
         overall_score, risk_level = calculate_risk(findings)
 
         return ScanResponse(
